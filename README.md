@@ -1,0 +1,1 @@
+# SM_Scam_Wallets
