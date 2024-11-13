@@ -1,9 +1,7 @@
 from bs4 import BeautifulSoup
 import asyncio
 from playwright.async_api import async_playwright
-from datetime import datetime, timedelta
 import sqlite3
-import re
 
 async def get_wallet_total(addresses):
   wallet_data = {}
