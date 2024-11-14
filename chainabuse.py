@@ -4,17 +4,20 @@ from playwright.async_api import async_playwright
 from datetime import datetime, timedelta
 import sqlite3
 import re
+from dotenv import load_dotenv
+import os
 
 async def scrape_chainabuse(conn, cursor):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=False)
         page = await browser.new_page()
-
+        load_dotenv()
+        password = os.getenv("PASSWORD")
         # Login to chainabuse first
         await page.goto('https://auth.chainabuse.com/u/login/identifier?state=hKFo2SBJaTUyV29ZWEVfVVNneW8xZnVVQkJLcWdSMUNXRmItN6Fur3VuaXZlcnNhbC1sb2dpbqN0aWTZIHdhN2ZPc1l3QXJWc0NETWZubktFS0FJY3RHdEdXa0dDo2NpZNkgTU5YdXZUUjVRYVZxMkVyM1ptSTV1OTNia3gxa29nYTg')
         await page.locator("[name='username']").fill("joe58400@gmail.com")
         await page.locator('[name="action"]').click()
-        await page.locator('[name="password"]').fill('kq5EsQ5Akjfmi!s')
+        await page.locator('[name="password"]').fill(password)
         await page.locator('[name="action"]').click()
 
         #await page.wait_for_timeout(2000)
