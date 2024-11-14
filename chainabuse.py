@@ -23,11 +23,12 @@ async def scrape_chainabuse(conn, cursor):
         #await page.wait_for_timeout(2000)
 
         # Start at page 873
-        for i in range(7):
+        for i in range(50):
             print(f"Page {i}")
             # Check different sorting to try to find the most human entries 
             #await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=up-votes")
-            await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=most-comments")
+            #await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=most-comments")
+            await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=newest&filter=BTC")
 
             await page.wait_for_selector(".create-ScamReportCard__body")
 
@@ -44,10 +45,23 @@ async def scrape_chainabuse(conn, cursor):
                 paragraphs = report.select(".create-Editor__paragraph")
                 report_txt = " ".join(p.get_text(separator=" ", strip=True) for p in paragraphs)
 
+                platform_keywords = {
+                        "youtube": "youtube",
+                        "twitter": "twitter",
+                        "tweet": "twitter",
+                        "x.com": "twitter",
+                        "discord": "discord",
+                        "facebook": "facebook",
+                        "instagram": "instagram",
+                        "tiktok": "tiktok",
+                        "snapchat": "snapchat",
+                        "telegram": "telegram",
+                        "reddit": "reddit"
+                }
                 # Search through each report text to find the social media platform 
-                for keyword in ["youtube", "twitter", "discord", "facebook", "instagram", "tiktok", "snapchat", "telegram"]:
+                for keyword, platform_val in platform_keywords.items():
                     if keyword in report_txt.lower():
-                        platform = keyword
+                        platform = platform_val
                         break
                 
                 if platform:
