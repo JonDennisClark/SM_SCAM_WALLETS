@@ -12,10 +12,11 @@ async def scrape_chainabuse(conn, cursor):
         browser = await p.chromium.launch(headless=False)
         page = await browser.new_page()
         load_dotenv()
+        user = os.getenv("USER")
         password = os.getenv("PASSWORD")
         # Login to chainabuse first
         await page.goto('https://auth.chainabuse.com/u/login/identifier?state=hKFo2SBJaTUyV29ZWEVfVVNneW8xZnVVQkJLcWdSMUNXRmItN6Fur3VuaXZlcnNhbC1sb2dpbqN0aWTZIHdhN2ZPc1l3QXJWc0NETWZubktFS0FJY3RHdEdXa0dDo2NpZNkgTU5YdXZUUjVRYVZxMkVyM1ptSTV1OTNia3gxa29nYTg')
-        await page.locator("[name='username']").fill("joe58400@gmail.com")
+        await page.locator("[name='username']").fill(user)
         await page.locator('[name="action"]').click()
         await page.locator('[name="password"]').fill(password)
         await page.locator('[name="action"]').click()
@@ -23,7 +24,7 @@ async def scrape_chainabuse(conn, cursor):
         #await page.wait_for_timeout(2000)
 
         # Start at page 873
-        for i in range(50):
+        for i in range(100,300):
             print(f"Page {i}")
             # Check different sorting to try to find the most human entries 
             #await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=up-votes")
