@@ -24,12 +24,13 @@ async def scrape_chainabuse(conn, cursor):
         #await page.wait_for_timeout(2000)
 
         # Start at page 873
-        for i in range(100,300):
+        for i in range(1667):
             print(f"Page {i}")
             # Check different sorting to try to find the most human entries 
             #await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=up-votes")
             #await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=most-comments")
-            await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=newest&filter=BTC")
+            #await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=newest&filter=ETH")
+            await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=oldest&filter=ETH")
 
             await page.wait_for_selector(".create-ScamReportCard__body")
 
