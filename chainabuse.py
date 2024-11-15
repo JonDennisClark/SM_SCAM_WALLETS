@@ -4,27 +4,33 @@ from playwright.async_api import async_playwright
 from datetime import datetime, timedelta
 import sqlite3
 import re
+from dotenv import load_dotenv
+import os
 
 async def scrape_chainabuse(conn, cursor):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=False)
         page = await browser.new_page()
-
+        load_dotenv()
+        user = os.getenv("USER")
+        password = os.getenv("PASSWORD")
         # Login to chainabuse first
         await page.goto('https://auth.chainabuse.com/u/login/identifier?state=hKFo2SBJaTUyV29ZWEVfVVNneW8xZnVVQkJLcWdSMUNXRmItN6Fur3VuaXZlcnNhbC1sb2dpbqN0aWTZIHdhN2ZPc1l3QXJWc0NETWZubktFS0FJY3RHdEdXa0dDo2NpZNkgTU5YdXZUUjVRYVZxMkVyM1ptSTV1OTNia3gxa29nYTg')
-        await page.locator("[name='username']").fill("joe58400@gmail.com")
+        await page.locator("[name='username']").fill(user)
         await page.locator('[name="action"]').click()
-        await page.locator('[name="password"]').fill('kq5EsQ5Akjfmi!s')
+        await page.locator('[name="password"]').fill(password)
         await page.locator('[name="action"]').click()
 
         #await page.wait_for_timeout(2000)
 
         # Start at page 873
-        for i in range(7):
+        for i in range(1667):
             print(f"Page {i}")
             # Check different sorting to try to find the most human entries 
             #await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=up-votes")
-            await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=most-comments")
+            #await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=most-comments")
+            #await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=newest&filter=ETH")
+            await page.goto(f"https://www.chainabuse.com/category/phishing?page={i}&sort=oldest&filter=ETH")
 
             await page.wait_for_selector(".create-ScamReportCard__body")
 
@@ -41,10 +47,23 @@ async def scrape_chainabuse(conn, cursor):
                 paragraphs = report.select(".create-Editor__paragraph")
                 report_txt = " ".join(p.get_text(separator=" ", strip=True) for p in paragraphs)
 
+                platform_keywords = {
+                        "youtube": "youtube",
+                        "twitter": "twitter",
+                        "tweet": "twitter",
+                        "x.com": "twitter",
+                        "discord": "discord",
+                        "facebook": "facebook",
+                        "instagram": "instagram",
+                        "tiktok": "tiktok",
+                        "snapchat": "snapchat",
+                        "telegram": "telegram",
+                        "reddit": "reddit"
+                }
                 # Search through each report text to find the social media platform 
-                for keyword in ["youtube", "twitter", "discord", "facebook", "instagram", "tiktok", "snapchat", "telegram"]:
+                for keyword, platform_val in platform_keywords.items():
                     if keyword in report_txt.lower():
-                        platform = keyword
+                        platform = platform_val
                         break
                 
                 if platform:
